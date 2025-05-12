@@ -45,11 +45,10 @@ public class GameController
             return IntVector2.Left;
         if (IsKeyPressedOnce(previous, current, Keys.D) || IsKeyPressedOnce(previous, current, Keys.Right)) 
             return IntVector2.Right;
+        
         return IntVector2.Zero;
     }
     
-    private static bool IsKeyPressedOnce(KeyboardState previous, KeyboardState current, Keys key)
-    {
-        return current.IsKeyDown(key) && previous.IsKeyUp(key);
-    }
+    private static bool IsKeyPressedOnce(KeyboardState previous, KeyboardState current, Keys key) =>
+        current.IsKeyDown(key) && previous.IsKeyUp(key);
 }

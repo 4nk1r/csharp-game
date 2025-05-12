@@ -54,22 +54,51 @@ public class MazeGenerator
 
     private void PlaceParcels(int count)
     {
-        var emptyCells = new List<IntVector2>();
-
+        var deadEnds = new Stack<IntVector2>();
         for (var x = 1; x < width - 1; x++)
         for (var y = 1; y < height - 1; y++)
-            if (grid[x, y] == CellType.Empty)
-                emptyCells.Add(new IntVector2(x, y));
-
-        if (count > emptyCells.Count)
-            count = emptyCells.Count;
-
-        for (var i = 0; i < count; i++)
         {
-            var idx = random.Next(emptyCells.Count);
-            var pos = emptyCells[idx];
-            emptyCells.RemoveAt(idx);
+            if ((x == 1 && y == 1) || grid[x, y] != CellType.Empty)
+                continue;
+
+            var neighbors = 0;
+            foreach (var dir in IntVector2.Directions)
+            {
+                int nx = x + dir.X, ny = y + dir.Y;
+                if (InBounds(nx, ny) && grid[nx, ny] == CellType.Empty)
+                    neighbors++;
+            }
+
+            if (neighbors == 1) deadEnds.Push(new IntVector2(x, y));
+        }
+        var placed = 0;
+        while (placed < count && deadEnds.Count > 0)
+        {
+            var pos = deadEnds.Pop();
             grid[pos.X, pos.Y] = CellType.Parcel;
+            placed++;
+        }
+
+        if (placed < count)
+        {
+            var emptyCells = new List<IntVector2>();
+            for (var x = 1; x < width - 1; x++)
+            for (var y = 1; y < height - 1; y++)
+            {
+                if ((x == 1 && y == 1) || grid[x, y] != CellType.Empty)
+                    continue;
+                emptyCells.Add(new IntVector2(x, y));
+            }
+
+            while (placed < count && emptyCells.Count > 0)
+            {
+                var idx = random.Next(emptyCells.Count);
+                var pos = emptyCells[idx];
+                emptyCells.RemoveAt(idx);
+
+                grid[pos.X, pos.Y] = CellType.Parcel;
+                placed++;
+            }
         }
     }
 
