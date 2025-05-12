@@ -1,4 +1,6 @@
 using CityCourier.Model;
+using CityCourier.Model.Types;
+using CityCourier.View;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -6,31 +8,48 @@ namespace CityCourier.Controller;
 
 public class GameController
 {
-    private const float PlayerSpeed = 200f;
-
+    private Maze _maze;
     private Player _player;
+    private KeyboardState _previousKeyboardState;
 
-    public GameController(Player player)
+    public GameController(Player player, Maze maze)
     {
         _player = player;
+        _maze = maze;
+        _previousKeyboardState = Keyboard.GetState(); 
     }
 
-    public void Update(GameTime gameTime)
+    public void Update()
     {
-        var keyboard = Keyboard.GetState();
+        var currentKeyboard = Keyboard.GetState();
 
-        _player.Move(GetPlayerDirection(keyboard) * (float)gameTime.ElapsedGameTime.TotalSeconds * PlayerSpeed);
+        var direction = GetPlayerDirection(_previousKeyboardState, currentKeyboard);
+        if (direction != IntVector2.Zero)
+        {
+            var currentGridPos = _player.Position / MazeView.TileSize;
+            var targetGridPos = currentGridPos + direction;
+
+            if (_maze.IsWalkable(targetGridPos)) _player.Move(direction * MazeView.TileSize);
+        }
+
+        _previousKeyboardState = currentKeyboard;
     }
 
-    private static Vector2 GetPlayerDirection(KeyboardState keyboard)
+    private static IntVector2 GetPlayerDirection(KeyboardState previous, KeyboardState current)
     {
-        var direction = Vector2.Zero;
-
-        if (keyboard.IsKeyDown(Keys.W) || keyboard.IsKeyDown(Keys.Up)) direction.Y -= 1;
-        if (keyboard.IsKeyDown(Keys.S) || keyboard.IsKeyDown(Keys.Down)) direction.Y += 1;
-        if (keyboard.IsKeyDown(Keys.A) || keyboard.IsKeyDown(Keys.Left)) direction.X -= 1;
-        if (keyboard.IsKeyDown(Keys.D) || keyboard.IsKeyDown(Keys.Right)) direction.X += 1;
-
-        return direction;
+        if (IsKeyPressedOnce(previous, current, Keys.W) || IsKeyPressedOnce(previous, current, Keys.Up)) 
+            return IntVector2.Up;
+        if (IsKeyPressedOnce(previous, current, Keys.S) || IsKeyPressedOnce(previous, current, Keys.Down)) 
+            return IntVector2.Down;
+        if (IsKeyPressedOnce(previous, current, Keys.A) || IsKeyPressedOnce(previous, current, Keys.Left)) 
+            return IntVector2.Left;
+        if (IsKeyPressedOnce(previous, current, Keys.D) || IsKeyPressedOnce(previous, current, Keys.Right)) 
+            return IntVector2.Right;
+        return IntVector2.Zero;
+    }
+    
+    private static bool IsKeyPressedOnce(KeyboardState previous, KeyboardState current, Keys key)
+    {
+        return current.IsKeyDown(key) && previous.IsKeyUp(key);
     }
 }

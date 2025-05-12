@@ -1,2 +1,2 @@
-﻿using var game = new CityCourier.Game1();
+﻿using var game = new CityCourier.CityCourierGame();
 game.Run();
