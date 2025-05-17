@@ -19,9 +19,16 @@ public class Maze
         Grid = generator.Generate(ParcelCount);
     }
 
-    public bool IsWalkable(IntVector2 target) => IsWithinBounds(target) && this[target] != CellType.Wall;
+    public bool IsWalkable(IntVector2 target) => 
+        IsWithinBounds(target) && this[target] != CellType.House && this[target] != CellType.DeliveryTarget;
+
+    public bool IsDeliveryTarget(IntVector2 target) => IsWithinBounds(target) && this[target] == CellType.DeliveryTarget;
     
     public bool IsWithinBounds(IntVector2 pos) => pos.X >= 0 && pos.X < Width && pos.Y >= 0 && pos.Y < Height;
 
-    public CellType this[IntVector2 pos] => Grid[pos.X, pos.Y];
+    public CellType this[IntVector2 pos]
+    {
+        get => Grid[pos.X, pos.Y];
+        set => Grid[pos.X, pos.Y] = value;
+    }
 }

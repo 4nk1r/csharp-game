@@ -24,6 +24,7 @@ public class MazeGenerator
         GenerateMazeDFS(1, 1);
 
         PlaceParcels(parcelCount);
+        PlaceDeliveryTargets(parcelCount);
         return grid;
     }
 
@@ -31,7 +32,7 @@ public class MazeGenerator
     {
         for (var x = 0; x < width; x++)
         for (var y = 0; y < height; y++)
-            grid[x, y] = CellType.Wall;
+            grid[x, y] = CellType.House;
     }
 
     private void GenerateMazeDFS(int startX, int startY)
@@ -44,11 +45,31 @@ public class MazeGenerator
             var nx = startX + dir.X * 2;
             var ny = startY + dir.Y * 2;
 
-            if (InBounds(nx, ny) && grid[nx, ny] == CellType.Wall)
+            if (InBounds(nx, ny) && grid[nx, ny] == CellType.House)
             {
                 grid[startX + dir.X, startY + dir.Y] = CellType.Empty; // carve path
                 GenerateMazeDFS(nx, ny);
             }
+        }
+    }
+    
+    private void PlaceDeliveryTargets(int n)
+    {
+        var wallCells = new List<IntVector2>();
+        for (var x = 1; x < width - 1; x++)
+        for (var y = 1; y < height - 1; y++)
+            if (grid[x, y] == CellType.House)
+                wallCells.Add(new IntVector2(x, y));
+
+        n = Math.Min(n, wallCells.Count);
+
+        for (var i = 0; i < n; i++)
+        {
+            var idx = random.Next(wallCells.Count);
+            var pos = wallCells[idx];
+            wallCells.RemoveAt(idx);
+
+            grid[pos.X, pos.Y] = CellType.DeliveryTarget;
         }
     }
 

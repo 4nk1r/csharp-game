@@ -3,6 +3,7 @@ namespace CityCourier.Model.Types;
 public enum CellType
 {
     Empty,
-    Wall,
+    House,
+    DeliveryTarget,
     Parcel
 }

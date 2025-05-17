@@ -19,6 +19,7 @@ public class CityCourierGame : Game
     private Maze _maze;
     private MazeView _mazeView;
 
+    private InputController _inputController;
     private GameController _gameController;
 
     public CityCourierGame()
@@ -35,13 +36,15 @@ public class CityCourierGame : Game
 
         _maze = new Maze();
         _mazeView = new MazeView(
-            Content.Load<Texture2D>("wall"), 
+            Content.Load<Texture2D>("house"), 
+            Content.Load<Texture2D>("delivery_target"), 
             Content.Load<Texture2D>("floor"),
             Content.Load<Texture2D>("parcel"));
 
         _player = new Player();
         _playerView = new PlayerView(Content.Load<Texture2D>("player"));
 
+        _inputController = new InputController(_player, _maze);
         _gameController = new GameController(_player, _maze);
     }
 
@@ -49,6 +52,7 @@ public class CityCourierGame : Game
     {
         if (Keyboard.GetState().IsKeyDown(Keys.Escape)) Exit();
 
+        _inputController.Update();
         _gameController.Update();
         base.Update(gameTime);
     }
