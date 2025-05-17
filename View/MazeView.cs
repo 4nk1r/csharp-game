@@ -25,7 +25,7 @@ public class MazeView
         for (var x = 0; x < maze.Width; x++)
         for (var y = 0; y < maze.Height; y++)
         {
-            var position = new Vector2(x * TileSize, y * TileSize);
+            var position = new Vector2(x * TileSize, y * TileSize + InfoBarView.Height);
             var texture = maze.Grid[x, y] switch
             {
                 CellType.House => _houseTexture,

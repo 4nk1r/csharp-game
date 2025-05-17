@@ -11,6 +11,8 @@ public class PlayerView
     private readonly Texture2D _texture;
     private readonly IntVector2 _origin;
 
+    private Vector2 _infoBarOffset = new(0, InfoBarView.Height);
+
     public PlayerView(Texture2D texture)
     {
         _texture = texture;
@@ -21,7 +23,7 @@ public class PlayerView
     {
         spriteBatch.Draw(
             texture: _texture, 
-            position: player.Position.ToVector2(),
+            position: player.Position.ToVector2() + _infoBarOffset,
             sourceRectangle: null,
             color: Color.White,
             rotation: 0f,
