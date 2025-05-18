@@ -47,7 +47,10 @@ public class CityCourierGame : Game
             Content.Load<Texture2D>("floor"),
             Content.Load<Texture2D>("parcel"));
 
-        _player = new Player();
+        _player = new Player
+        {
+            Energy = _maze.OptimalPathLength
+        };
         _playerView = new PlayerView(Content.Load<Texture2D>("player"));
 
         var fontSystem = new FontSystem();

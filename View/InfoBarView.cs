@@ -20,7 +20,7 @@ public class InfoBarView
         SpriteFontBase font = _fontSystem.GetFont(Height - 16);
         spriteBatch.DrawString(
             font,
-            $"Время: {infoBar.Timer} {new string(' ', 10)} Посылок в инвентаре: {infoBar.CarryingParcels}",
+            $"Время: {infoBar.Timer} {new string(' ', 10)} Посылок в инвентаре: {infoBar.CarryingParcels} {new string(' ', 10)} Энергия: {infoBar.RemainedEnergy}",
             new Vector2(16, 8),
             new Color(48, 29, 26)
         );

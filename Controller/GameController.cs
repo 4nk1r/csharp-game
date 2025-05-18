@@ -26,9 +26,11 @@ public class GameController
             _player.CollectParcel();
         }
 
-        if (_maze.ParcelsCount > 0 || _player.ParcelsCarrying > 0)
+        if ((_maze.ParcelsCount > 0 || _player.ParcelsCarrying > 0) && _player.Energy > 0)
             _infoBar.Timer =
                 $"{(int)gameTime.TotalGameTime.TotalMinutes:00}:{(int)gameTime.TotalGameTime.TotalSeconds % 60:00}";
+        
         _infoBar.CarryingParcels = _player.ParcelsCarrying;
+        _infoBar.RemainedEnergy = _player.Energy;
     }
 }

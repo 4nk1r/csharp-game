@@ -9,6 +9,7 @@ public class Maze
     private const int ParcelCount = 6;
 
     public CellType[,] Grid { get; }
+    public readonly int OptimalPathLength;
 
     public int ParcelsCount
     {
@@ -29,19 +30,22 @@ public class Maze
     public Maze()
     {
         var generator = new MazeGenerator(MazeWidth, MazeHeight);
+        var solver = new MazeSolver();
+        
         Grid = generator.Generate(ParcelCount);
+        OptimalPathLength = solver.GetShortestPathLength(Grid);
     }
 
     public bool IsWalkable(IntVector2 target) => 
         IsWithinBounds(target) && this[target] != CellType.House && this[target] != CellType.DeliveryTarget;
 
     public bool IsDeliveryTarget(IntVector2 target) => IsWithinBounds(target) && this[target] == CellType.DeliveryTarget;
-    
-    public bool IsWithinBounds(IntVector2 pos) => pos.X >= 0 && pos.X < Width && pos.Y >= 0 && pos.Y < Height;
 
     public CellType this[IntVector2 pos]
     {
         get => Grid[pos.X, pos.Y];
         set => Grid[pos.X, pos.Y] = value;
     }
+
+    private bool IsWithinBounds(IntVector2 pos) => pos.X >= 0 && pos.X < Width && pos.Y >= 0 && pos.Y < Height;
 }
