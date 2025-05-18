@@ -2,7 +2,6 @@
 using System.Reflection;
 using CityCourier.Controller;
 using CityCourier.Model;
-using CityCourier.Model.Types;
 using CityCourier.View;
 using FontStashSharp;
 using Microsoft.Xna.Framework;
@@ -13,14 +12,20 @@ namespace CityCourier;
 
 public class CityCourierGame : Game
 {
-    private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
+    private FontSystem _fontSystem;
+    private Texture2D _restartTexture;
 
     private Player _player;
     private PlayerView _playerView;
+    private Texture2D _playerTexture;
 
     private Maze _maze;
     private MazeView _mazeView;
+    private Texture2D _houseTexture;
+    private Texture2D _deliveryTargetTexture;
+    private Texture2D _floorTexture;
+    private Texture2D _parcelTexture;
 
     private InfoBar _infoBar;
     private InfoBarView _infoBarView;
@@ -30,35 +35,48 @@ public class CityCourierGame : Game
 
     public CityCourierGame()
     {
-        _graphics = new GraphicsDeviceManager(this);
+        var graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        UpdateWindowSize(_graphics);
+        UpdateWindowSize(graphics);
     }
 
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+        LoadTextures();
+        InitializeGame();
+    }
+
+    private void LoadTextures()
+    {
+        _houseTexture = Content.Load<Texture2D>("house");
+        _deliveryTargetTexture = Content.Load<Texture2D>("delivery_target");
+        _floorTexture = Content.Load<Texture2D>("floor");
+        _parcelTexture = Content.Load<Texture2D>("parcel");
+        _playerTexture = Content.Load<Texture2D>("player");
+        _restartTexture = Content.Load<Texture2D>("restart_btn");
+
+        _fontSystem = new FontSystem();
+        _fontSystem.AddFont(GetFileBytes(@"Content/Impact.ttf"));
+    }
+
+    private void InitializeGame()
+    {
         _maze = new Maze();
-        _mazeView = new MazeView(
-            Content.Load<Texture2D>("house"), 
-            Content.Load<Texture2D>("delivery_target"), 
-            Content.Load<Texture2D>("floor"),
-            Content.Load<Texture2D>("parcel"));
+        _mazeView = new MazeView(_houseTexture, _deliveryTargetTexture, _floorTexture, _parcelTexture);
 
         _player = new Player
         {
             Energy = _maze.OptimalPathLength
         };
-        _playerView = new PlayerView(Content.Load<Texture2D>("player"));
+        _playerView = new PlayerView(_playerTexture);
 
-        var fontSystem = new FontSystem();
-        fontSystem.AddFont(GetFileBytes(@"Content/Impact.ttf"));
         _infoBar = new InfoBar();
-        _infoBarView = new InfoBarView(fontSystem);
+        _infoBarView = new InfoBarView(_fontSystem, _restartTexture);
 
-        _inputController = new InputController(_player, _maze);
+        _inputController = new InputController(_player, _maze, _infoBar);
         _gameController = new GameController(_player, _maze, _infoBar);
     }
 
@@ -66,8 +84,9 @@ public class CityCourierGame : Game
     {
         if (Keyboard.GetState().IsKeyDown(Keys.Escape)) Exit();
 
-        _inputController.Update();
-        _gameController.Update(gameTime);
+        if (_inputController.Update()) InitializeGame();
+        else _gameController.Update(gameTime);
+        
         base.Update(gameTime);
     }
 
@@ -93,7 +112,7 @@ public class CityCourierGame : Game
     
     private static byte[] GetFileBytes(string fileName)
     {
-        string assemblyLocation = Assembly.GetExecutingAssembly().Location;
+        var assemblyLocation = Assembly.GetExecutingAssembly().Location;
         var path = Path.Combine(Path.GetDirectoryName(assemblyLocation), fileName);
         return File.ReadAllBytes(path);
     }

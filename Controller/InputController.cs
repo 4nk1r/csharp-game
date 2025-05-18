@@ -1,27 +1,47 @@
 using CityCourier.Model;
 using CityCourier.Model.Types;
 using CityCourier.View;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace CityCourier.Controller;
 
 public class InputController
 {
-    private Maze _maze;
-    private Player _player;
+    private readonly Maze _maze;
+    private readonly Player _player;
+    private readonly InfoBar _infoBar;
+    
     private KeyboardState _previousKeyboardState;
-
-    public InputController(Player player, Maze maze)
+    private MouseState _previousMouseState;
+    
+    public InputController(Player player, Maze maze, InfoBar infoBar)
     {
         _player = player;
         _maze = maze;
-        _previousKeyboardState = Keyboard.GetState(); 
+        _infoBar = infoBar;
+        _previousKeyboardState = Keyboard.GetState();
+        _previousMouseState = Mouse.GetState();
     }
 
-    public void Update()
+    public bool Update()
     {
         var currentKeyboard = Keyboard.GetState();
+        var currentMouse = Mouse.GetState();
+        var gameRestarted = false;
 
+        if (_infoBar.CurrentState != InfoBar.State.InGame)
+            if (IsMouseClickedOnce(currentMouse, _previousMouseState))
+            {
+                var restartButtonBounds = new Rectangle(
+                    InfoBarView.RestartButtonPosition.X,
+                    InfoBarView.RestartButtonPosition.Y,
+                    InfoBarView.RestartButtonSize.width,
+                    InfoBarView.RestartButtonSize.height
+                );
+                gameRestarted = restartButtonBounds.Contains(currentMouse.Position);
+            }
+        
         var direction = GetPlayerDirection(_previousKeyboardState, currentKeyboard);
         if (direction != IntVector2.Zero)
         {
@@ -34,8 +54,10 @@ public class InputController
                 if (_player.DeliverParcel()) _maze[targetGridPos] = CellType.House;
             }
         }
-
         _previousKeyboardState = currentKeyboard;
+        _previousMouseState = currentMouse;
+        
+        return gameRestarted;
     }
 
     private static IntVector2 GetPlayerDirection(KeyboardState previous, KeyboardState current)
@@ -54,4 +76,7 @@ public class InputController
     
     private static bool IsKeyPressedOnce(KeyboardState previous, KeyboardState current, Keys key) =>
         current.IsKeyDown(key) && previous.IsKeyUp(key);
+
+    private static bool IsMouseClickedOnce(MouseState current, MouseState previous) =>
+        current.LeftButton == ButtonState.Released && previous.LeftButton == ButtonState.Pressed;
 }

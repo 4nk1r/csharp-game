@@ -16,9 +16,10 @@ public class GameController
         _player = player;
         _maze = maze;
         _infoBar = infoBar;
+        _infoBar.StartTime = 0;
     }
     
-    public void Update(GameTime gameTime)
+    public void Update(GameTime time)
     {
         if (_maze[_player.Position / MazeView.TileSize] == CellType.Parcel)
         {
@@ -27,8 +28,18 @@ public class GameController
         }
 
         if ((_maze.ParcelsCount > 0 || _player.ParcelsCarrying > 0) && _player.Energy > 0)
-            _infoBar.Timer =
-                $"{(int)gameTime.TotalGameTime.TotalMinutes:00}:{(int)gameTime.TotalGameTime.TotalSeconds % 60:00}";
+        {
+            if (_infoBar.StartTime == 0)
+                _infoBar.StartTime = time.TotalGameTime.TotalSeconds;
+                
+            var elapsedSeconds = time.TotalGameTime.TotalSeconds - _infoBar.StartTime;
+            _infoBar.Timer = $"{(int)elapsedSeconds / 60:00}:{(int)elapsedSeconds % 60:00}";
+            _infoBar.CurrentState = InfoBar.State.InGame;
+        }
+        else
+            _infoBar.CurrentState = _player.Energy == 0 && _maze.ParcelsCount + _player.ParcelsCarrying > 0
+                ? InfoBar.State.Loss
+                : InfoBar.State.Win;
         
         _infoBar.CarryingParcels = _player.ParcelsCarrying;
         _infoBar.RemainedEnergy = _player.Energy;
