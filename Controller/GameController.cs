@@ -37,7 +37,7 @@ public class GameController
             _infoBar.CurrentState = InfoBar.State.InGame;
         }
         else
-            _infoBar.CurrentState = _player.Energy == 0 && _maze.ParcelsCount + _player.ParcelsCarrying > 0
+            _infoBar.CurrentState = _player.Energy <= 0 && _maze.ParcelsCount + _player.ParcelsCarrying > 0
                 ? InfoBar.State.Loss
                 : InfoBar.State.Win;
         
