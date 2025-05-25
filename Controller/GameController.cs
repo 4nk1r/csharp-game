@@ -7,9 +7,9 @@ namespace CityCourier.Controller;
 
 public class GameController
 {
-    private Maze _maze;
-    private Player _player;
-    private InfoBar _infoBar;
+    private readonly Maze _maze;
+    private readonly Player _player;
+    private readonly InfoBar _infoBar;
 
     public GameController(Player player, Maze maze, InfoBar infoBar)
     {

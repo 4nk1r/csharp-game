@@ -6,23 +6,10 @@ using Microsoft.Xna.Framework.Input;
 
 namespace CityCourier.Controller;
 
-public class InputController
+public class InputController(Player player, Maze maze, InfoBar infoBar)
 {
-    private readonly Maze _maze;
-    private readonly Player _player;
-    private readonly InfoBar _infoBar;
-    
-    private KeyboardState _previousKeyboardState;
-    private MouseState _previousMouseState;
-    
-    public InputController(Player player, Maze maze, InfoBar infoBar)
-    {
-        _player = player;
-        _maze = maze;
-        _infoBar = infoBar;
-        _previousKeyboardState = Keyboard.GetState();
-        _previousMouseState = Mouse.GetState();
-    }
+    private KeyboardState _previousKeyboardState = Keyboard.GetState();
+    private MouseState _previousMouseState = Mouse.GetState();
 
     public bool Update()
     {
@@ -30,7 +17,7 @@ public class InputController
         var currentMouse = Mouse.GetState();
         var gameRestarted = false;
 
-        if (_infoBar.CurrentState != InfoBar.State.InGame)
+        if (infoBar.CurrentState != InfoBar.State.InGame)
             if (IsMouseClickedOnce(currentMouse, _previousMouseState))
             {
                 var restartButtonBounds = new Rectangle(
@@ -45,16 +32,16 @@ public class InputController
         var direction = GetPlayerDirection(_previousKeyboardState, currentKeyboard);
         if (direction != IntVector2.Zero)
         {
-            var currentGridPos = _player.Position / MazeView.TileSize;
+            var currentGridPos = player.Position / MazeView.TileSize;
             var targetGridPos = currentGridPos + direction;
 
-            if (_maze.IsWalkable(targetGridPos)) _player.Move(direction * MazeView.TileSize);
-            else if (_maze.IsDeliveryTarget(targetGridPos))
+            if (maze.IsWalkable(targetGridPos)) player.Move(direction * MazeView.TileSize);
+            else if (maze.IsDeliveryTarget(targetGridPos))
             {
-                if (_player.DeliverParcel())
+                if (player.DeliverParcel())
                 {
-                    _maze[targetGridPos] = CellType.House;
-                    _maze.OpenFences();
+                    maze[targetGridPos] = CellType.House;
+                    maze.OpenFences();
                 }
             }
         }

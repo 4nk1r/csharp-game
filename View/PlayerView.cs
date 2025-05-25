@@ -6,23 +6,16 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace CityCourier.View;
 
-public class PlayerView
+public class PlayerView(Texture2D texture)
 {
-    private readonly Texture2D _texture;
-    private readonly IntVector2 _origin;
+    private readonly IntVector2 _origin = IntVector2.Zero;
 
-    private Vector2 _infoBarOffset = new(0, InfoBarView.Height);
-
-    public PlayerView(Texture2D texture)
-    {
-        _texture = texture;
-        _origin = IntVector2.Zero;
-    }
+    private readonly Vector2 _infoBarOffset = new(0, InfoBarView.Height);
 
     public void Draw(SpriteBatch spriteBatch, Player player)
     {
         spriteBatch.Draw(
-            texture: _texture, 
+            texture: texture, 
             position: player.Position.ToVector2() + _infoBarOffset,
             sourceRectangle: null,
             color: Color.White,
