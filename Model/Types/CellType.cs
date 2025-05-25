@@ -5,5 +5,6 @@ public enum CellType
     Empty,
     House,
     DeliveryTarget,
-    Parcel
+    Parcel,
+    Fence
 }

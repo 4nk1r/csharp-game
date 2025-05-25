@@ -51,7 +51,11 @@ public class InputController
             if (_maze.IsWalkable(targetGridPos)) _player.Move(direction * MazeView.TileSize);
             else if (_maze.IsDeliveryTarget(targetGridPos))
             {
-                if (_player.DeliverParcel()) _maze[targetGridPos] = CellType.House;
+                if (_player.DeliverParcel())
+                {
+                    _maze[targetGridPos] = CellType.House;
+                    _maze.OpenFences();
+                }
             }
         }
         _previousKeyboardState = currentKeyboard;

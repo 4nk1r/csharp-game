@@ -6,20 +6,10 @@ using Vector2 = System.Numerics.Vector2;
 
 namespace CityCourier.View;
 
-public class MazeView
+public class MazeView(Texture2D house, Texture2D deliveryTarget, Texture2D floor, Texture2D parcel, Texture2D fence)
 {
     public const int TileSize = 64;
-
-    private readonly Texture2D _houseTexture, _deliveryTarget, _floorTexture, _parcelTexture;
-
-    public MazeView(Texture2D house, Texture2D deliveryTarget, Texture2D floor, Texture2D parcel)
-    {
-        _houseTexture = house;
-        _deliveryTarget = deliveryTarget;
-        _floorTexture = floor;
-        _parcelTexture = parcel;
-    }
-
+    
     public void Draw(SpriteBatch spriteBatch, Maze maze)
     {
         for (var x = 0; x < maze.Width; x++)
@@ -28,11 +18,12 @@ public class MazeView
             var position = new Vector2(x * TileSize, y * TileSize + InfoBarView.Height);
             var texture = maze.Grid[x, y] switch
             {
-                CellType.House => _houseTexture,
-                CellType.Empty => _floorTexture,
-                CellType.Parcel => _parcelTexture,
-                CellType.DeliveryTarget => _deliveryTarget,
-                _ => _floorTexture
+                CellType.House => house,
+                CellType.Empty => floor,
+                CellType.Parcel => parcel,
+                CellType.DeliveryTarget => deliveryTarget,
+                CellType.Fence => fence,
+                _ => floor
             };
             spriteBatch.Draw(texture, position, Color.White);
         }

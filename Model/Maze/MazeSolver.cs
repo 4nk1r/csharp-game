@@ -24,7 +24,7 @@ public class MazeSolver
 
         List<(int, int)> parcels = [];
         List<(int, int)> deliveryTargets = [];
-        List<(int, int)> houses = [];
+        List<(int, int)> walls = [];
 
         for (var y = 0; y < _rows; y++)
         for (var x = 0; x < _cols; x++)
@@ -36,20 +36,21 @@ public class MazeSolver
                 case CellType.DeliveryTarget:
                     deliveryTargets.Add((x, y));
                     break;
-                case CellType.House:
-                    houses.Add((x, y));
+                case CellType.House: 
+                case CellType.Fence:
+                    walls.Add((x, y));
                     break;
             }
 
         var sortedParcels = parcels.OrderBy(p => p.Item1).ThenBy(p => p.Item2).ToArray();
         var sortedTargets = deliveryTargets.OrderBy(t => t.Item1).ThenBy(t => t.Item2).ToArray();
-        var sortedHouses = houses.OrderBy(h => h.Item1).ThenBy(h => h.Item2).ToArray();
+        var sortedWalls = walls.OrderBy(h => h.Item1).ThenBy(h => h.Item2).ToArray();
         
         _maxParcelsToCollect = sortedParcels.Length;
         _maxTargetsToDeliver = sortedTargets.Length;
         if (_maxParcelsToCollect > _maxTargetsToDeliver) return -1;
 
-        var initialState = new State(startX, startY, 0, sortedParcels, sortedTargets, sortedHouses);
+        var initialState = new State(startX, startY, 0, sortedParcels, sortedTargets, sortedWalls);
         
         var openSet = new MinHeap();
         var bestCostToState = new Dictionary<State, int>(1024);
@@ -87,7 +88,7 @@ public class MazeSolver
     
     private static CellType GetCellType(int x, int y, State state)
     {
-        if (Array.BinarySearch(state.Houses, (x, y)) >= 0)
+        if (Array.BinarySearch(state.Walls, (x, y)) >= 0)
             return CellType.House;
         
         if (Array.BinarySearch(state.RemainingDeliveryTargets, (x, y)) >= 0)
@@ -117,7 +118,7 @@ public class MazeSolver
                     currentState.ParcelsCarrying,
                     currentState.RemainingParcels,
                     currentState.RemainingDeliveryTargets,
-                    currentState.Houses
+                    currentState.Walls
                 );
                 
                 AddNodeIfBetter(newState, newCost, openSet, bestCostToState);
@@ -134,7 +135,7 @@ public class MazeSolver
                         currentState.ParcelsCarrying + 1,
                         newRemainingParcels,
                         currentState.RemainingDeliveryTargets,
-                        currentState.Houses
+                        currentState.Walls
                     );
                     
                     AddNodeIfBetter(parcelState, newCost, openSet, bestCostToState);
@@ -148,7 +149,7 @@ public class MazeSolver
                     if (targetIndex >= 0)
                     {
                         var newRemainingTargets = RemoveItemAtIndex(currentState.RemainingDeliveryTargets, targetIndex);
-                        var newHouses = AddItemToSortedArray(currentState.Houses, (newX, newY));
+                        var newHouses = AddItemToSortedArray(currentState.Walls, (newX, newY));
                         
                         var deliveryState = new State(
                             currentState.X, currentState.Y,
@@ -273,14 +274,14 @@ public class MazeSolver
         
         public readonly (int, int)[] RemainingParcels;
         public readonly (int, int)[] RemainingDeliveryTargets;
-        public readonly (int, int)[] Houses;
+        public readonly (int, int)[] Walls;
         
         private readonly int _hashCode;
 
         public State(int x, int y, int parcelsCarrying, 
                      (int, int)[] remainingParcels, 
                      (int, int)[] remainingDeliveryTargets,
-                     (int, int)[] houses,
+                     (int, int)[] walls,
                      bool computeHash = true)
         {
             X = x;
@@ -288,7 +289,7 @@ public class MazeSolver
             ParcelsCarrying = parcelsCarrying;
             RemainingParcels = remainingParcels;
             RemainingDeliveryTargets = remainingDeliveryTargets;
-            Houses = houses;
+            Walls = walls;
             
             _hashCode = computeHash ? ComputeHashCode() : 0;
         }
@@ -306,7 +307,7 @@ public class MazeSolver
                     .Aggregate(hash, (current, t) => current * 31 + t.GetHashCode());
                 hash = RemainingDeliveryTargets
                     .Aggregate(hash, (current, t) => current * 31 + t.GetHashCode());
-                return Houses.Aggregate(hash, (current, t) => current * 31 + t.GetHashCode());
+                return Walls.Aggregate(hash, (current, t) => current * 31 + t.GetHashCode());
             }
         }
 
@@ -318,7 +319,7 @@ public class MazeSolver
                              || ParcelsCarrying != other.ParcelsCarrying
                              || RemainingParcels.Length != other.RemainingParcels.Length 
                              || RemainingDeliveryTargets.Length != other.RemainingDeliveryTargets.Length
-                             || Houses.Length != other.Houses.Length) return false;
+                             || Walls.Length != other.Walls.Length) return false;
             
             if (RemainingParcels.Where((t, i) => !t.Equals(other.RemainingParcels[i])).Any())
                 return false;
@@ -326,8 +327,8 @@ public class MazeSolver
             for (var i = RemainingDeliveryTargets.Length - 1; i >= 0; i--)
                 if (!RemainingDeliveryTargets[i].Equals(other.RemainingDeliveryTargets[i])) return false;
             
-            for (var i = Houses.Length - 1; i >= 0; i--)
-                if (!Houses[i].Equals(other.Houses[i])) return false;
+            for (var i = Walls.Length - 1; i >= 0; i--)
+                if (!Walls[i].Equals(other.Walls[i])) return false;
             
             return true;
         }

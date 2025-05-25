@@ -4,8 +4,8 @@ namespace CityCourier.Model;
 
 public class Maze
 {
-    public const int MazeWidth = 25;
-    public const int MazeHeight = 13;
+    public const int MazeWidth = 15;
+    public const int MazeHeight = 11;
     private const int ParcelCount = 6;
 
     public CellType[,] Grid { get; }
@@ -36,8 +36,18 @@ public class Maze
         OptimalPathLength = solver.GetShortestPathLength(Grid);
     }
 
-    public bool IsWalkable(IntVector2 target) => 
-        IsWithinBounds(target) && this[target] != CellType.House && this[target] != CellType.DeliveryTarget;
+    public void OpenFences()
+    {
+        for (var x = 0; x < Width; x++)
+        for (var y = 0; y < Height; y++)
+            if (Grid[x, y] == CellType.Fence)
+                Grid[x, y] = CellType.Empty;
+    }
+
+    public bool IsWalkable(IntVector2 target) => IsWithinBounds(target) 
+                                                 && this[target] != CellType.House 
+                                                 && this[target] != CellType.DeliveryTarget
+                                                 && this[target] != CellType.Fence;
 
     public bool IsDeliveryTarget(IntVector2 target) => IsWithinBounds(target) && this[target] == CellType.DeliveryTarget;
 

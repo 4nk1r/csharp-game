@@ -26,6 +26,7 @@ public class CityCourierGame : Game
     private Texture2D _deliveryTargetTexture;
     private Texture2D _floorTexture;
     private Texture2D _parcelTexture;
+    private Texture2D _fenceTexture;
 
     private InfoBar _infoBar;
     private InfoBarView _infoBarView;
@@ -55,6 +56,7 @@ public class CityCourierGame : Game
         _deliveryTargetTexture = Content.Load<Texture2D>("delivery_target");
         _floorTexture = Content.Load<Texture2D>("floor");
         _parcelTexture = Content.Load<Texture2D>("parcel");
+        _fenceTexture = Content.Load<Texture2D>("fence");
         _playerTexture = Content.Load<Texture2D>("player");
         _restartTexture = Content.Load<Texture2D>("restart_btn");
 
@@ -65,11 +67,11 @@ public class CityCourierGame : Game
     private void InitializeGame()
     {
         _maze = new Maze();
-        _mazeView = new MazeView(_houseTexture, _deliveryTargetTexture, _floorTexture, _parcelTexture);
+        _mazeView = new MazeView(_houseTexture, _deliveryTargetTexture, _floorTexture, _parcelTexture, _fenceTexture);
 
         _player = new Player
         {
-            Energy = _maze.OptimalPathLength
+            Energy = (int)(_maze.OptimalPathLength * Player.InitialEnergyCoefficient)
         };
         _playerView = new PlayerView(_playerTexture);
 

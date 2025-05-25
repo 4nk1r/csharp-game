@@ -25,6 +25,7 @@ public class MazeGenerator
 
         PlaceParcels(parcelCount);
         PlaceDeliveryTargets(parcelCount);
+        PlaceFences(3);
         return grid;
     }
 
@@ -52,7 +53,8 @@ public class MazeGenerator
             }
         }
     }
-    
+
+    // randomly replaces n houses with delivery targets
     private void PlaceDeliveryTargets(int n)
     {
         var wallCells = new List<IntVector2>();
@@ -73,6 +75,7 @@ public class MazeGenerator
         }
     }
 
+    // tries to place parcels in dead-ends, randomly otherwise
     private void PlaceParcels(int count)
     {
         var deadEnds = new Stack<IntVector2>();
@@ -92,6 +95,7 @@ public class MazeGenerator
 
             if (neighbors == 1) deadEnds.Push(new IntVector2(x, y));
         }
+
         var placed = 0;
         while (placed < count && deadEnds.Count > 0)
         {
@@ -120,6 +124,38 @@ public class MazeGenerator
                 grid[pos.X, pos.Y] = CellType.Parcel;
                 placed++;
             }
+        }
+    }
+
+    // places fences in positions where houses have empty cells on both sides horizontally or vertically
+    private void PlaceFences(int n)
+    {
+        var potentialFences = new List<IntVector2>();
+
+        for (var x = 1; x < width - 1; x++)
+        for (var y = 1; y < height - 1; y++)
+        {
+            if (grid[x, y] != CellType.House) continue;
+
+            if (InBounds(x - 1, y) && InBounds(x + 1, y) && InBounds(x, y - 1) && InBounds(x, y + 1)
+                && grid[x - 1, y] == CellType.Empty && grid[x + 1, y] == CellType.Empty
+                && grid[x, y - 1] != CellType.Empty && grid[x, y + 1] != CellType.Empty)
+                potentialFences.Add(new IntVector2(x, y));
+
+            if (InBounds(x - 1, y) && InBounds(x + 1, y) && InBounds(x, y - 1) && InBounds(x, y + 1)
+                && grid[x - 1, y] != CellType.Empty && grid[x + 1, y] != CellType.Empty
+                && grid[x, y - 1] == CellType.Empty && grid[x, y + 1] == CellType.Empty)
+                potentialFences.Add(new IntVector2(x, y));
+        }
+
+        n = Math.Min(n, potentialFences.Count);
+        for (var i = 0; i < n; i++)
+        {
+            var idx = random.Next(potentialFences.Count);
+            var pos = potentialFences[idx];
+            potentialFences.RemoveAt(idx);
+
+            grid[pos.X, pos.Y] = CellType.Fence;
         }
     }
 
