@@ -4,10 +4,6 @@ namespace CityCourier.Model;
 
 public class Maze
 {
-    public const int MazeWidth = 15;
-    public const int MazeHeight = 11;
-    private const int ParcelCount = 6;
-
     public CellType[,] Grid { get; }
     public readonly int OptimalPathLength;
 
@@ -16,8 +12,8 @@ public class Maze
         get
         {
             var count = 0;
-            for (var x = 0; x < MazeWidth; x++)
-            for (var y = 0; y < MazeHeight; y++)
+            for (var x = 0; x < CityCourierGame.MazeWidth; x++)
+            for (var y = 0; y < CityCourierGame.MazeHeight; y++)
                 if (Grid[x, y] == CellType.Parcel)
                     count++;
             return count;
@@ -29,10 +25,10 @@ public class Maze
 
     public Maze()
     {
-        var generator = new MazeGenerator(MazeWidth, MazeHeight);
+        var generator = new MazeGenerator(CityCourierGame.MazeWidth, CityCourierGame.MazeHeight);
         var solver = new MazeSolver();
         
-        Grid = generator.Generate(ParcelCount);
+        Grid = generator.Generate(CityCourierGame.ParcelCount);
         OptimalPathLength = solver.GetShortestPathLength(Grid);
     }
 

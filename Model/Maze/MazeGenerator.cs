@@ -25,7 +25,7 @@ public class MazeGenerator
 
         PlaceParcels(parcelCount);
         PlaceDeliveryTargets(parcelCount);
-        PlaceFences(3);
+        PlaceFences(CityCourierGame.FenceCount);
         return grid;
     }
 

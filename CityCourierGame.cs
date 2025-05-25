@@ -12,6 +12,11 @@ namespace CityCourier;
 
 public class CityCourierGame : Game
 {
+    public const int MazeWidth = 15;
+    public const int MazeHeight = 11;
+    public const int ParcelCount = 6;
+    public const int FenceCount = 2;
+    
     private SpriteBatch _spriteBatch;
     private FontSystem _fontSystem;
     private Texture2D _restartTexture;
@@ -107,8 +112,8 @@ public class CityCourierGame : Game
 
     private void UpdateWindowSize(GraphicsDeviceManager graphics)
     {
-        graphics.PreferredBackBufferWidth = Maze.MazeWidth * MazeView.TileSize;
-        graphics.PreferredBackBufferHeight = Maze.MazeHeight * MazeView.TileSize + InfoBarView.Height;
+        graphics.PreferredBackBufferWidth = MazeWidth * MazeView.TileSize;
+        graphics.PreferredBackBufferHeight = MazeHeight * MazeView.TileSize + InfoBarView.Height;
         graphics.ApplyChanges();
     }
     
