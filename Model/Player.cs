@@ -5,8 +5,6 @@ namespace CityCourier.Model;
 
 public class Player
 {
-    public const double InitialEnergyCoefficient = 1.05;
-    
     public IntVector2 Position { get; private set; } = new IntVector2(1, 1) * MazeView.TileSize;
     public int ParcelsCarrying { get; private set; }
     public int Energy { get; set; }

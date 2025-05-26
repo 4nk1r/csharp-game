@@ -16,6 +16,7 @@ public class CityCourierGame : Game
     public const int MazeHeight = 11;
     public const int ParcelCount = 6;
     public const int FenceCount = 2;
+    public const double InitialEnergyCoefficient = 1.05;
     
     private SpriteBatch _spriteBatch;
     private FontSystem _fontSystem;
@@ -76,7 +77,7 @@ public class CityCourierGame : Game
 
         _player = new Player
         {
-            Energy = (int)(_maze.OptimalPathLength * Player.InitialEnergyCoefficient)
+            Energy = (int)(_maze.OptimalPathLength * InitialEnergyCoefficient)
         };
         _playerView = new PlayerView(_playerTexture);
 
